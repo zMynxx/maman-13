@@ -1,3 +1,4 @@
+---
 version: '3.8'
 networks:
   sandbox:
@@ -23,7 +24,7 @@ services:
         com.zmynxx.release-date: *date
         com.zmynxx.version: 1.0.0
         com.zmynxx.java.version: *version
-      tags: ['druxx/maven-jdk:latest']
+      tags: [druxx/maven-jdk:latest]
     environment: [TZ=Asia/Jerusalem]
     tty: true
     stdin_open: true
