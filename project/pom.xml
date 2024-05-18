@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	       xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+  <!-- 
+    These are used to uniquely identify the artifact across the world.
+    groupId: reverse domain name of the organization 
+    artifactId: application name
+  -->
+  <groupId>com.zmynxx</groupId>
+  <artifactId>app</artifactId>
+
+  <!-- 
+    version: version of the artifact
+    SNAPSHOT: version is under development
+    packaging: type of the artifact (jar, war, ear, pom)
+  -->
+	<version>1.0-SNAPSHOT</version>
+	<packaging>jar</packaging>
+
+  <name>app</name>
+  <description>Java application template project</description>
+  <url>https://www.github.com/zmynxx</url>
+
+  <!---
+    Repositories: used to define the repositories where the dependencies are located.
+    Pull external dependencies.
+  -->
+  <repositories>
+    <repository>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+      <id>spring-milestones</id>
+      <name>Spring Milestones</name>
+      <url>https://repo.spring.io/milestone</url>
+    </repository>
+  </repositories>
+
+  <!-- 
+    Properties are used to define values that can be reused in the POM.
+    They are defined in the properties section of the POM.
+  -->
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <maven.compiler.vesion>3.2</maven.compiler.vesion>
+    <maven.compiler.source>1.7</maven.compiler.source>
+    <maven.compiler.target>1.7</maven.compiler.target>
+    <junit.version>4.1</junit.version>
+  </properties>
+
+  <!-- 
+    Dependencies are used to define the dependencies of the project.
+    They are defined in the dependencies section of the POM.
+  -->
+	<dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>${junit.version}</version>
+      <!-- 
+        scope: where the dependency is available (compile, test, runtime)
+      -->
+      <scope>test</scope>
+		</dependency>
+	</dependencies>
+
+  <!-- 
+    Build is used to define the build configuration of the project.
+    It is defined in the build section of the POM.
+  -->
+	<build>
+		<sourceDirectory>src/main/java</sourceDirectory>
+		<testSourceDirectory>src/test/java</testSourceDirectory>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-compiler-plugin</artifactId>
+          <version>${maven.compiler.vesion}</version>
+					<configuration>
+						<verbose>true</verbose>
+            <source>${maven.compiler.source}</source>
+            <target>${maven.compiler.target}</target>
+						<showWarnings>true</showWarnings>
+					</configuration>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+	</build>
+</project>

@@ -1,0 +1,38 @@
+version: '3.8'
+networks:
+  sandbox:
+    name: dev-network
+    external: true
+services:
+  app:
+    container_name: java-dev
+    platform: linux/amd64
+    build:
+      context: .
+      dockerfile: Dockerfile.jdk
+      target: base
+      args:
+        JAVA_VERSION: &version 11
+        DATE: &date $(date +'%Y-%m-%d')
+      labels:
+        com.zmynxx.description: This is a development environment for Java applications.
+        com.zmynxx.department: DevOps
+        com.zmynxx.maintainer-email: lior.dux@develeap.com
+        com.zmynxx.repository: https://github.com/zMynxx
+        com.zmynxx.maintainer: Lior Dux
+        com.zmynxx.release-date: *date
+        com.zmynxx.version: 1.0.0
+        com.zmynxx.java.version: *version
+      tags: ['druxx/maven-jdk:latest']
+    environment: [TZ=Asia/Jerusalem]
+    tty: true
+    stdin_open: true
+    working_dir: /home/developer/project
+    entrypoint: [sleep, infinity]
+    volumes:
+      - ./.m2:/home/developer/.m2
+      - ./project:/home/developer/project
+    # ports:
+    #   - "8080:8080"
+    networks: [sandbox]
+    restart: unless-stopped

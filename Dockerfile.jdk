@@ -1,0 +1,65 @@
+# ######################################################
+# ### Stage 1 - Base image (development environment) ###
+# ######################################################
+# FROM eclipse-temurin:17-jdk-jammy as deps
+#
+# WORKDIR /build
+#
+# # Copy the mvnw wrapper with executable permissions.
+# COPY --chmod=0755 mvnw mvnw
+# COPY .mvn/ .mvn/
+#
+# # Download dependencies as a separate step to take advantage of Docker's caching.
+# # Leverage a cache mount to /root/.m2 so that subsequent builds don't have to
+# # re-download packages.
+# RUN --mount=type=bind,source=pom.xml,target=pom.xml \
+#     --mount=type=cache,target=/root/.m2 ./mvnw dependency:go-offline -DskipTests
+
+######################################################
+### Stage 1 - Base image (development environment) ###
+######################################################
+FROM maven:3.8.7-openjdk-18-slim as base
+ARG UID=10001
+RUN useradd \
+    --system \
+    --create-home \
+    --home-dir "/home/developer" \
+    --shell "/bin/bash" \
+    --gid root \
+    --groups sudo \
+    --uid ${UID} \
+    developer
+
+USER developer 
+COPY project $HOME/
+WORKDIR /home/developer/project
+
+# Download dependencies as a separate step to take advantage of Docker's caching.
+# Leverage a cache mount to /root/.m2 so that subsequent builds don't have to
+# re-download packages.
+# RUN --mount=type=cache,target=/home/developer/.m2 mvn dependency:go-offline -DskipTests
+
+CMD ["/bin/bash"]
+
+###########################################################
+### Stage 2 - Build image (compile, generate artifacts) ###
+###########################################################
+FROM deps as package
+
+WORKDIR /project
+COPY --from=base /project/src/main /project/src/main
+COPY --from=base /project/pom.xml /project/pom.xml
+RUN --mount=type=bind,source=pom.xml,target=pom.xml \
+    --mount=type=cache,target=/root/.m2 \
+    ./mvnw package -DskipTests && \
+    mv target/$(./mvnw help:evaluate -Dexpression=project.artifactId -q -DforceStdout)-$(./mvnw help:evaluate -Dexpression=project.version -q -DforceStdout).jar target/app.jar
+
+##########################################################
+### Stage 3 - Production image (serve our application) ###
+##########################################################
+# Need a JRE-slim image to run the application
+FROM maven:3.8.7-openjre-18-slim as release
+
+# Use COPY to pull artifact from previous build layer
+COPY --from=package /project/target/app.jar app.jar
+ENTRYPOINT ["/bin/java","-jar","app.jar"]
